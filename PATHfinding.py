@@ -1,5 +1,3 @@
-# Para el video de YT "¿Por qué este Algoritmo está en tantos Videojuegos? - A* Explicado"
-
 import pygame
 import sys
 import heapq

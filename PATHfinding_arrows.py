@@ -11,7 +11,7 @@ width, height = 1400, 780
 win = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Pathfinding A*")
 
-heuristic_weight = 1
+heuristic_weigth = 1
 
 # Colores
 black = (0, 0, 0)
@@ -21,11 +21,11 @@ green = (0, 255, 0)
 red = (255, 0, 0)
 yellow = (255, 255, 0)  # Lista abierta
 light_blue = (173, 216, 230)  # Lista cerrada
-purple = (172, 63, 176)  # Camino más corto
+purple = (209, 125, 212)  # Camino más corto
+text_color = black  # Color del texto
 
 # Dimensiones de cada celda
-# cell_size = 64
-cell_size = 50
+cell_size = 90
 
 # Número de filas y columnas
 cols = width // cell_size
@@ -42,8 +42,8 @@ PATH = 8  # Estado de la celda para el camino más corto
 
 # Inicializar la cuadrícula con todas las celdas libres
 grid = [[FREE for _ in range(rows)] for _ in range(cols)]
-g_score = {}  # Diccionario para almacenar el g-score de cada celda
-h_score = {}  # Diccionario para almacenar el h-score de cada celda
+g_score = {}  # Diccionario para almacenar el costo g de cada celda
+h_score = {}  # Diccionario para almacenar el costo H de cada celda
 
 # Posiciones de inicio y final
 start_pos = (0, 0)
@@ -70,9 +70,12 @@ path = []  # Ruta más corta
 
 # Crear fuente para los botones y texto
 font = pygame.font.SysFont(None, 36)
+text_font = pygame.font.SysFont(None, int(cell_size / 2.7))  # Fuente para el texto del costo
+text_font_big = pygame.font.SysFont(None, int(cell_size / 1.94))  # Fuente para el texto del costo
 
-def draw_arrow(surface, color, start, end, arrow_size=20, arrow_angle=20):
-    pygame.draw.line(surface, color, start, end, 3)  # Línea principal más gruesa
+# Función para dibujar la flecha
+def draw_arrow(surface, color, start, end, arrow_size=10, arrow_angle=30):
+    pygame.draw.line(surface, color, start, end, 2)  # Línea principal
 
     # Calcular los ángulos para las líneas de la punta de la flecha
     angle = math.atan2(end[1] - start[1], end[0] - start[0])
@@ -84,12 +87,11 @@ def draw_arrow(surface, color, start, end, arrow_size=20, arrow_angle=20):
     end2 = (end[0] - arrow_size * math.cos(angle2), end[1] - arrow_size * math.sin(angle2))
 
     # Dibujar la punta de la flecha
-    pygame.draw.line(surface, color, end, end1, 3)
-    pygame.draw.line(surface, color, end, end2, 3)
-
+    pygame.draw.line(surface, color, end, end1, 2)
+    pygame.draw.line(surface, color, end, end2, 2)
 
 # Función para dibujar la cuadrícula
-def draw_grid(show_arrows=False, only_path=False):
+def draw_grid(show_weights=True, show_path=False):
     for x in range(cols):
         for y in range(rows):
             rect = pygame.Rect(x * cell_size, y * cell_size, cell_size, cell_size)
@@ -106,34 +108,51 @@ def draw_grid(show_arrows=False, only_path=False):
             elif grid[x][y] == CLOSED:
                 pygame.draw.rect(win, light_blue, rect)
             elif grid[x][y] == PATH:
-                if not only_path:
-                    pygame.draw.rect(win, purple, rect)
-                else:
-                    pygame.draw.rect(win, white, rect)
+                pygame.draw.rect(win, purple, rect)
+
+            # Mostrar el f-score en la celda (simple suma de g + h)
+            if show_weights and (grid[x][y] in [OPEN, CLOSED, END, PATH]):
+                if (x, y) in g_score and (x, y) in h_score:
+                    f_score = g_score[(x, y)] + h_score[(x, y)]  # Simple suma de g + h
+                    f_text = text_font_big.render(str(f_score), True, text_color)
+                    f_rect = f_text.get_rect(center=(x * cell_size + cell_size // 2, y * cell_size + cell_size // 2))
+                    win.blit(f_text, f_rect)
+
+            # Dibujar una flecha dentro del nodo apuntando al nodo de donde vino
+            if (x, y) in came_from:  # Dibujar solo si el nodo viene de otro nodo
+                from_x, from_y = came_from[(x, y)]
+                
+                if (from_x, from_y) != (x, y):  # Asegurarse de no dibujar la flecha en el mismo nodo
+                    # Calcular el centro del nodo actual (donde estará la flecha)
+                    center_x = x * cell_size + cell_size // 2
+                    center_y = y * cell_size + cell_size // 2
+
+                    # Calcular la posición desde la que viene la flecha (en el borde del nodo actual)
+                    offset = 35  # Mover la flecha más cerca del borde
+                    start_offset = 25  # Mover el inicio de la flecha lejos del centro
+                    if from_x < x:  # Viene de la izquierda
+                        line_start_x = center_x - offset
+                        line_end_x = center_x - start_offset
+                    elif from_x > x:  # Viene de la derecha
+                        line_start_x = center_x + offset
+                        line_end_x = center_x + start_offset
+                    else:
+                        line_start_x = line_end_x = center_x
+                    
+                    if from_y < y:  # Viene de arriba
+                        line_start_y = center_y - offset
+                        line_end_y = center_y - start_offset
+                    elif from_y > y:  # Viene de abajo
+                        line_start_y = center_y + offset
+                        line_end_y = center_y + start_offset
+                    else:
+                        line_start_y = line_end_y = center_y
+
+                    # Dibujar la flecha
+                    draw_arrow(win, black, (line_end_x, line_end_y), (line_start_x, line_start_y))
 
             pygame.draw.rect(win, gray, rect, 1)
 
-
-show_arrows = False  # Nueva variable para controlar si las flechas deben mostrarse
-
-def draw_arrows_on_path():
-    line_thickness = 3  # Grosor de la línea
-
-    for x, y in path:
-        if (x, y) in came_from:
-            from_x, from_y = came_from[(x, y)]
-
-            if (from_x, from_y) != (x, y):  # Asegurarse de no dibujar la flecha en el mismo nodo
-                # Calcular el centro del nodo actual
-                start_x = x * cell_size + cell_size // 2
-                start_y = y * cell_size + cell_size // 2
-
-                # Calcular el centro del nodo de origen
-                end_x = from_x * cell_size + cell_size // 2
-                end_y = from_y * cell_size + cell_size // 2
-
-                # Dibujar la línea desde el centro del nodo actual al centro del nodo de origen
-                pygame.draw.line(win, purple, (start_x, start_y), (end_x, end_y), line_thickness)
 
 
 # Función para calcular la heurística diagonal
@@ -182,7 +201,7 @@ def a_star_step():
             g_score[neighbor] = tentative_g_score
             h_score[neighbor] = tentative_h_score
             
-            f_score = tentative_g_score + heuristic_weight * (tentative_h_score + 0.001 * tentative_h_score)
+            f_score = tentative_g_score + heuristic_weigth * (tentative_h_score + 0.001 * tentative_h_score)
 
             heapq.heappush(open_set, (f_score, neighbor))
             print(f"Nodo {neighbor} -> f_score: {f_score}, g_score: {tentative_g_score}, h_score: {tentative_h_score}")
@@ -299,12 +318,13 @@ while True:
 
             if reset_button.collidepoint(event.pos):
                 reset_grid()
-                show_arrows = False  # Ocultar las flechas al hacer reset
             elif reset_all_button.collidepoint(event.pos):
                 reset_all_grid()
-                show_arrows = False  # Ocultar las flechas al hacer reset total
             elif path_found and action_button.collidepoint(event.pos):
-                show_arrows = True  # Activar la visualización de las flechas
+                for pos in path:
+                    if pos != end_pos:  # Verifica si la posición no es el nodo final
+                        grid[pos[0]][pos[1]] = PATH
+                draw_grid(show_weights=False, show_path=True)
             elif not path_found and action_button.collidepoint(event.pos):
                 if not step_by_step:
                     init_a_star()  # Inicializar el algoritmo para paso a paso
@@ -344,10 +364,7 @@ while True:
     win.fill(white)
     draw_grid()
     draw_buttons()
-
-    if show_arrows:  # Dibujar las flechas si la bandera está activada
-        draw_arrows_on_path()
-
+    
     if step_by_step and next_step:
         path = a_star_step()  # Ejecutar un paso del algoritmo
 
