@@ -26,9 +26,6 @@ Ejemplo de funcionamiento del Script "PATHfinding_arrows.py":
 
 ![ejemplo2][5]
 
-Script creado para el video:
-https://youtu.be/hQa9JTtq4Ok
-
 Links (Fuentes)
 ------------------------
 - http://theory.stanford.edu/~amitp/GameProgramming/
