@@ -35,7 +35,4 @@ Links (Fuentes)
 - http://theory.stanford.edu/~amitp/GameProgramming/AStarComparison.html#the-a-star-algorithm
 - http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#a-starx27s-use-of-the-heuristic
 
-
-
-
-[1]: 
+[1]: https://raw.githubusercontent.com/cb3ndev/Visualizador-Algoritmo-A-Estrella/refs/heads/main/img/diagonal.jpg
