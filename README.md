@@ -32,6 +32,10 @@ Links (Fuentes)
 - http://theory.stanford.edu/~amitp/GameProgramming/AStarComparison.html#the-a-star-algorithm
 - http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#a-starx27s-use-of-the-heuristic-
 
+Agradecimientos
+------------------------
+Para realizar el código de este visualizador me inspire en el que se observa en el vídeo de S. Lague (https://www.youtube.com/watch?v=-L-WgKMFuhE) ya que se me hizo muy didáctico. 
+
 [1]: https://raw.githubusercontent.com/cb3ndev/Visualizador-Algoritmo-A-Estrella/refs/heads/main/img/diagonal.jpg
 [2]: https://raw.githubusercontent.com/cb3ndev/Visualizador-Algoritmo-A-Estrella/refs/heads/main/img/diagrama1.JPG
 [3]: https://raw.githubusercontent.com/cb3ndev/Visualizador-Algoritmo-A-Estrella/refs/heads/main/img/diagrama2.JPG
