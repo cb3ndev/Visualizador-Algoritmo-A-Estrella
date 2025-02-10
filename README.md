@@ -1,4 +1,4 @@
-Visualizador Algoritmo A Estrella
+Visualizador Algoritmo A Estrella (A*)
 =======
 
 ### Requisitos
@@ -30,7 +30,7 @@ Links (Fuentes)
 ------------------------
 - http://theory.stanford.edu/~amitp/GameProgramming/
 - http://theory.stanford.edu/~amitp/GameProgramming/AStarComparison.html#the-a-star-algorithm
-- http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#a-starx27s-use-of-the-heuristic
+- http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#a-starx27s-use-of-the-heuristic-
 
 [1]: https://raw.githubusercontent.com/cb3ndev/Visualizador-Algoritmo-A-Estrella/refs/heads/main/img/diagonal.jpg
 [2]: https://raw.githubusercontent.com/cb3ndev/Visualizador-Algoritmo-A-Estrella/refs/heads/main/img/diagrama1.JPG
